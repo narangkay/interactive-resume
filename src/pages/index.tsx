@@ -1,6 +1,5 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 
 import { api } from "~/utils/api";
 import React, { useState } from "react";
@@ -12,14 +11,15 @@ const Home: NextPage = () => {
   const [prompt, setPrompt] = useState("");
   const prompts = [
     {
-      title: "Distributed Systems",
+      key: "distributed_systems",
       prompt: "What does Krish know about distributed systems?",
     },
     {
-      title: "Work Experience",
+      key: "work_experience",
       prompt: "What was your longest role?",
     },
     {
+      key: "key_skill",
       prompt: "What is a key skill you have developed through your work experience?",
     },
   ];
@@ -29,7 +29,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Krish Narang's Resume</title>
+        <title>Krish Narang&apos;s Resume</title>
         <meta
           name="description"
           content="An interactive resume for Krish Narang."
@@ -166,7 +166,7 @@ const Home: NextPage = () => {
           <h2 className="text-4xl font-bold text-gray-300">Example Prompts</h2>
           <ul className="menu w-[60%] bg-transparent p-2">
             {prompts.map((obj, i) => (
-              <li className="pb-2">
+              <li className="pb-2" key={obj.key}>
                 <a
                   className="bg-slate-950 text-2xl text-gray-300 hover:bg-amber-400 hover:text-slate-950"
                   onClick={(e) => {
