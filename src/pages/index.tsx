@@ -165,11 +165,11 @@ const Home: NextPage = () => {
         <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
           <h2 className="text-4xl font-bold text-gray-300">Example Prompts</h2>
           <ul className="menu w-[60%] bg-transparent p-2">
-            {prompts.map((obj, i) => (
+            {prompts.map(obj => (
               <li className="pb-2" key={obj.key}>
                 <a
                   className="bg-slate-950 text-2xl text-gray-300 hover:bg-amber-400 hover:text-slate-950"
-                  onClick={(e) => {
+                  onClick={(_e) => {
                     setPrompt(obj.prompt);
                   }}
                 >
