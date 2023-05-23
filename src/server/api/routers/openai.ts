@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { Configuration, OpenAIApi } from "openai";
 import { env } from "~/env.mjs";
 
 const RESUME = `Google — Senior Software Engineer
@@ -73,10 +72,10 @@ export const openaiRouter = createTRPCRouter({
       })
     )
     .output(z.object({ response: z.string() }))
-    .mutation(async  ({ input: { messages } }) => {
+    .mutation(async ({ input: { messages } }) => {
       messages = [{ role: "assistant", content: PROMPT_INSTRUCTIONS }, ...messages]
-      console.log(messages)
-      const responses = await fetch("https://api.openai.com/v1/chat/completions", {
+      console.log(messages[-1])
+      const fetchResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${env.OPENAI_API_KEY}`,
@@ -88,18 +87,30 @@ export const openaiRouter = createTRPCRouter({
           messages: messages,
         }),
       })
-      console.log(responses)
-      console.log(responses.status)
-      console.log(responses.statusText)
-      if (responses.status !== 200) {
+      console.log(fetchResponse.status)
+      console.log(fetchResponse.statusText)
+      if (fetchResponse.status !== 200) {
         return {
-          response: "Error: " + responses.statusText,
+          response: `Error ${fetchResponse.status}: ${fetchResponse.statusText}`,
         };
       }
-      console.log(responses.data?.id)
-      console.log(responses.data?.choices[0])
+      type JSONResponse = {
+        data?: {
+          id: string,
+          choices: Array<{message: {content: string}}>,
+        }
+        errors?: Array<{message: string}>
+      }
+      const {data, errors}: JSONResponse = await fetchResponse.json() as JSONResponse
+      if (errors) {
+        return {
+          response: `Error: ${errors[0]?.message ?? "Unknown error"}`,
+        }
+      }
+      console.log(data?.id)
+      console.log(data?.choices[0])
       return {
-        response: responses.data?.choices[0]?.message?.content ?? "No response",
+        response: data?.choices[0]?.message?.content ?? "No response",
       };
     }),
 });
