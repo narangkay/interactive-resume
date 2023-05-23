@@ -74,7 +74,7 @@ export const openaiRouter = createTRPCRouter({
     .output(z.object({ response: z.string() }))
     .mutation(async ({ input: { messages } }) => {
       messages = [{ role: "assistant", content: PROMPT_INSTRUCTIONS }, ...messages]
-      console.log(messages[-1])
+      console.log(messages[messages.length-1])
       const fetchResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -95,18 +95,11 @@ export const openaiRouter = createTRPCRouter({
         };
       }
       type JSONResponse = {
-        data?: {
-          id: string,
-          choices: Array<{message: {content: string}}>,
-        }
-        errors?: Array<{message: string}>
+        id: string,
+        choices: Array<{ message: { content: string } }>,
       }
-      const {data, errors}: JSONResponse = await fetchResponse.json() as JSONResponse
-      if (errors) {
-        return {
-          response: `Error: ${errors[0]?.message ?? "Unknown error"}`,
-        }
-      }
+      const data = await fetchResponse.json() as JSONResponse
+      console.log(data)
       console.log(data?.id)
       console.log(data?.choices[0])
       return {
