@@ -100,8 +100,7 @@ const Home: NextPage = () => {
                       />
                     </svg>
                     <span>
-                      Error! Open AI returned an error:{" "}
-                      {askAboutResume.error.message}
+                      Error! Open AI returned an error: {askAboutResume.error.message}
                     </span>
                   </div>
                 </div>
