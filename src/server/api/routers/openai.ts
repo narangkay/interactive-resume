@@ -77,14 +77,20 @@ export const openaiRouter = createTRPCRouter({
       })
     )
     .output(z.object({ response: z.string() }))
-    .mutation(async ({ input: { messages } }) => {
+    .mutation(({ input: { messages } }) => {
       messages = [{ role: "assistant", content: PROMPT_INSTRUCTIONS }, ...messages]
       console.log(messages)
-      const responses = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        temperature: 0,
-        messages: messages,
-      });
+      const responses = {
+        status: 200, statusText: "OK", data: {
+          id: "cmpl-3Z5K5Z5Z5Z5Z5",
+          choices: [{ message: { content: "woot" } }]
+        }
+      }
+      // const responses = await openai.createChatCompletion({
+      //   model: "gpt-3.5-turbo",
+      //   temperature: 0,
+      //   messages: messages,
+      // });
       console.log(responses)
       console.log(responses.status)
       console.log(responses.statusText)
