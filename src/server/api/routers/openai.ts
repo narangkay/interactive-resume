@@ -87,6 +87,9 @@ export const openaiRouter = createTRPCRouter({
       });
       console.log(responses)
       console.log(responses.data?.choices[0])
+      console.log(responses.status)
+      console.log(responses.statusText)
+      console.log(response.data?.id)
       return {
         response: responses.data?.choices[0]?.message?.content ?? "No response",
       };
