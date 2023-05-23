@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { TRPCError } from '@trpc/server';
 
 import { env } from "~/env.mjs";
 
@@ -48,15 +49,19 @@ Novel Solutions: Applying concepts across disciplines in unique ways, using mode
 Collaboration: Leading and growing teams with a focus on sustainable culture and transparency`
 
 const PROMPT_INSTRUCTIONS = `You are Krish, a Senior Software Engineer at Google. You have studied engineering at the Indian Institute of Bombay. You are looking for a new job and have been contacted by a recruiter with questions about your resume. Do your best to answer the questions and get the job. Your resume is provided below. Do not make up any information that is not in the resume.
-${RESUME}
 
-Examples:
-Q: What is your current role?
-A: I am a Senior Software Engineer at Google, leading a team of 14 engineers responsible for Google's subscriber acquisition and management platform.
-Q: What was your longest role?
-A: I have been at Google for 5 years, and have been a Senior Software Engineer for 3 years.
+For example:
+What is your current role?
+I am a Senior Software Engineer at Google, leading a team of 14 engineers responsible for Google's subscriber acquisition and management platform.
+
+What was your longest role?
+I have been at Google for 5 years, and have been a Senior Software Engineer for 3 years.
+
 Q: What do you know about distributed systems?
 A: I have worked on all aspects of distributed systems at Google, including microservices, event-driven systems, reliability and observability, latency optimization, database management.
+
+Your resume for reference:
+${RESUME}
 `
 
 export const openaiRouter = createTRPCRouter({
@@ -74,7 +79,8 @@ export const openaiRouter = createTRPCRouter({
     .output(z.object({ response: z.string() }))
     .mutation(async ({ input: { messages } }) => {
       messages = [{ role: "assistant", content: PROMPT_INSTRUCTIONS }, ...messages]
-      console.log(messages[messages.length-1])
+      console.log(PROMPT_INSTRUCTIONS)
+      console.log(messages[messages.length - 1])
       const fetchResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -90,9 +96,10 @@ export const openaiRouter = createTRPCRouter({
       console.log(fetchResponse.status)
       console.log(fetchResponse.statusText)
       if (fetchResponse.status !== 200) {
-        return {
-          response: `Error ${fetchResponse.status}: ${fetchResponse.statusText}`,
-        };
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `OpenAI returned error ${fetchResponse.status}: ${fetchResponse.statusText}`,
+        });
       }
       type JSONResponse = {
         id: string,
@@ -102,8 +109,15 @@ export const openaiRouter = createTRPCRouter({
       console.log(data)
       console.log(data?.id)
       console.log(data?.choices[0])
+      const answer = data?.choices[0]?.message?.content;
+      if (!answer) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'OpenAI returned no response',
+        });
+      }
       return {
-        response: data?.choices[0]?.message?.content ?? "No response",
+        response: answer
       };
     }),
 });
