@@ -165,19 +165,31 @@ const Home: NextPage = () => {
             </div>
           </div>
         </div>
-        <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
+        <div className={`container flex flex-col items-center justify-center gap-2 px-4 py-16 ${
+            suggestFollowupQuestions.isLoading ? "animate-pulse" : ""
+          }`}
+        >
           <h2 className="text-4xl font-bold text-gray-300"><span className="text-amber-400">Dynamic</span> Example Prompts</h2>
           <ul className="menu w-[60%] bg-transparent p-2">
             {followupQuestions.map((obj, i) => (
-              <li className="pb-2" key={i}>
-                <a
-                  className="bg-slate-950 text-2xl text-gray-300 hover:bg-amber-400 hover:text-slate-950"
-                  onClick={(_e) => {
-                    setPrompt(obj);
-                  }}
-                >
-                  {obj}
-                </a>
+              <li
+                className={`pb-2 ${askAboutResume.isLoading ? "disabled" : ""}`}
+                key={i}
+              >
+                {askAboutResume.isLoading ? (
+                  <div className="border-2 border-gray-600 text-2xl text-gray-300">
+                    {obj}
+                  </div>
+                ) : (
+                  <a
+                    className="bg-slate-950 text-2xl text-gray-300 hover:bg-amber-400 hover:text-slate-950"
+                    onClick={(_e) => {
+                      setPrompt(obj);
+                    }}
+                  >
+                    {obj}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
