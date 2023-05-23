@@ -4,11 +4,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import { Configuration, OpenAIApi } from "openai";
 import { env } from "~/env.mjs";
-// https://platform.openai.com/account/api-keys
-const configuration = new Configuration({
-  apiKey: env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+
 const RESUME = `Google — Senior Software Engineer
 Subscriber Acquisition And Management Platform, Team Lead
 2022-Present
@@ -77,20 +73,21 @@ export const openaiRouter = createTRPCRouter({
       })
     )
     .output(z.object({ response: z.string() }))
-    .mutation(({ input: { messages } }) => {
+    .mutation(async  ({ input: { messages } }) => {
       messages = [{ role: "assistant", content: PROMPT_INSTRUCTIONS }, ...messages]
       console.log(messages)
-      const responses = {
-        status: 200, statusText: "OK", data: {
-          id: "cmpl-3Z5K5Z5Z5Z5Z5",
-          choices: [{ message: { content: "woot" } }]
-        }
-      }
-      // const responses = await openai.createChatCompletion({
-      //   model: "gpt-3.5-turbo",
-      //   temperature: 0,
-      //   messages: messages,
-      // });
+      const responses = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          temperature: 0,
+          messages: messages,
+        }),
+      })
       console.log(responses)
       console.log(responses.status)
       console.log(responses.statusText)
