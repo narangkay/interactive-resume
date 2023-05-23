@@ -16,7 +16,8 @@ const Home: NextPage = () => {
   ]);
 
   const askAboutResume = api.openai.askAboutResume.useMutation();
-  const suggestFollowupQuestions = api.openai.suggestFollowupQuestions.useMutation();
+  const suggestFollowupQuestions =
+    api.openai.suggestFollowupQuestions.useMutation();
 
   return (
     <>
@@ -158,18 +159,24 @@ const Home: NextPage = () => {
                   value={prompt}
                   disabled={askAboutResume.isLoading}
                 />
-                <button className="btn-lg btn bg-amber-400 text-slate-950 hover:bg-gray-300">
+                <button
+                  className="btn-lg btn bg-amber-400 text-slate-950 hover:bg-gray-300"
+                  disabled={askAboutResume.isLoading}
+                >
                   Submit
                 </button>
               </form>
             </div>
           </div>
         </div>
-        <div className={`container flex flex-col items-center justify-center gap-2 px-4 py-16 ${
+        <div
+          className={`container flex flex-col items-center justify-center gap-2 px-4 py-16 ${
             suggestFollowupQuestions.isLoading ? "animate-pulse" : ""
           }`}
         >
-          <h2 className="text-4xl font-bold text-gray-300"><span className="text-amber-400">Dynamic</span> Example Prompts</h2>
+          <h2 className="text-4xl font-bold text-gray-300">
+            <span className="text-amber-400">Dynamic</span> Example Prompts
+          </h2>
           <ul className="menu w-[60%] bg-transparent p-2">
             {followupQuestions.map((obj, i) => (
               <li
