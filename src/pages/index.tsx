@@ -166,7 +166,7 @@ const Home: NextPage = () => {
           </div>
         </div>
         <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
-          <h2 className="text-4xl font-bold text-gray-300">Example Prompts (<span className="text-amber-400">dynamic</span>)</h2>
+          <h2 className="text-4xl font-bold text-gray-300"><span className="text-amber-400">Dynamic</span> Example Prompts</h2>
           <ul className="menu w-[60%] bg-transparent p-2">
             {followupQuestions.map((obj, i) => (
               <li className="pb-2" key={i}>
