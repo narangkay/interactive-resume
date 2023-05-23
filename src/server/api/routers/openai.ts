@@ -66,8 +66,12 @@ ${RESUME}
 `
 
 const FOLLOWUP_QUESTIONS_PROMPT = `${PREFIX}
-Suggest at least 2 followup questions that you think the recruiter might ask, that are relevant to the most recent question, and 1 or 2 questions from a different area. Respond with only the questions, separated by commas. Limit your questions to things you know the answer to. Keep the questions relevant for someone who does not have access to the resume. For example:
-What areas of distributed systems have you worked on?, What is your favorite part of working at Google?, What are areas where you can improve?
+Suggest at least 3 followup questions that you think the recruiter might ask from a variety of areas. Respond with only the questions, each on a different line. Limit your questions to things covered in the resume. For example:
+The recruiter has asked the following question: What do you know about distributed systems?
+Followup questions:
+What areas of distributed systems have you worked on?
+What is your favorite part of working at Google?
+What are areas where you can improve?
 
 Your resume for reference:
 ${RESUME}
@@ -134,7 +138,8 @@ export const openaiRouter = createTRPCRouter({
     .input(z.object({ lastQuestion: z.string(), }))
     .output(z.object({ followupQuestions: z.array(z.string()) }))
     .mutation(async ({ input: { lastQuestion } }) => {
-      const prompt = `${FOLLOWUP_QUESTIONS_PROMPT}The recruiter has asked the following question: ${lastQuestion}`
+      const prompt = `${FOLLOWUP_QUESTIONS_PROMPT}The recruiter has asked the following question: ${lastQuestion}
+Followup questions:`
       const fetchResponse = await fetch("https://api.openai.com/v1/completions", {
         method: "POST",
         headers: {
@@ -142,7 +147,7 @@ export const openaiRouter = createTRPCRouter({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "text-davinci-003",
+          model: "text-curie-001",
           temperature: 0,
           prompt: prompt,
           max_tokens: 200,
@@ -171,7 +176,7 @@ export const openaiRouter = createTRPCRouter({
           message: 'OpenAI returned no response',
         });
       }
-      const followupQuestions = answer.split(',').map((q) => q.trim())
+      const followupQuestions = answer.split('\n').map((q) => q.trim()).filter((q) => q.length > 5).filter((q) => q !== 'Followup questions:')
       return { followupQuestions }
     }),
 });
