@@ -12,7 +12,7 @@ const Home: NextPage = () => {
   const prompts = [
     {
       key: "distributed_systems",
-      prompt: "What does Krish know about distributed systems?",
+      prompt: "What do you know about distributed systems?",
     },
     {
       key: "work_experience",
