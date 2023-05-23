@@ -9,22 +9,14 @@ type messageType = { role: "user" | "assistant"; content: string };
 const Home: NextPage = () => {
   const [messages, setMessages] = useState<messageType[]>([]);
   const [prompt, setPrompt] = useState("");
-  const prompts = [
-    {
-      key: "distributed_systems",
-      prompt: "What do you know about distributed systems?",
-    },
-    {
-      key: "work_experience",
-      prompt: "What was your longest role?",
-    },
-    {
-      key: "key_skill",
-      prompt: "What is a key skill you have developed through your work experience?",
-    },
-  ];
+  const [followupQuestions, setFollowupQuestions] = useState<string[]>([
+    "What do you know about distributed systems?",
+    "What was your longest role?",
+    "What is a key skill you have developed through your work experience?",
+  ]);
 
   const askAboutResume = api.openai.askAboutResume.useMutation();
+  const suggestFollowupQuestions = api.openai.suggestFollowupQuestions.useMutation();
 
   return (
     <>
@@ -100,7 +92,8 @@ const Home: NextPage = () => {
                       />
                     </svg>
                     <span>
-                      Error! Open AI returned an error: {askAboutResume.error.message}
+                      Error! Open AI returned an error:{" "}
+                      {askAboutResume.error.message}
                     </span>
                   </div>
                 </div>
@@ -121,6 +114,7 @@ const Home: NextPage = () => {
                       content: prompt,
                     },
                   ];
+                  const lastQuestion = prompt;
                   askAboutResume.mutate(
                     {
                       messages: copyMessages,
@@ -138,6 +132,16 @@ const Home: NextPage = () => {
                           ]);
                         }
                         setPrompt("");
+                      },
+                    }
+                  );
+                  suggestFollowupQuestions.mutate(
+                    { lastQuestion: lastQuestion },
+                    {
+                      onSuccess: (data) => {
+                        if (data.followupQuestions) {
+                          setFollowupQuestions(data.followupQuestions);
+                        }
                       },
                     }
                   );
@@ -162,17 +166,17 @@ const Home: NextPage = () => {
           </div>
         </div>
         <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
-          <h2 className="text-4xl font-bold text-gray-300">Example Prompts</h2>
+          <h2 className="text-4xl font-bold text-gray-300">Example Prompts (<span className="text-amber-400">dynamic</span>)</h2>
           <ul className="menu w-[60%] bg-transparent p-2">
-            {prompts.map(obj => (
-              <li className="pb-2" key={obj.key}>
+            {followupQuestions.map((obj, i) => (
+              <li className="pb-2" key={i}>
                 <a
                   className="bg-slate-950 text-2xl text-gray-300 hover:bg-amber-400 hover:text-slate-950"
                   onClick={(_e) => {
-                    setPrompt(obj.prompt);
+                    setPrompt(obj);
                   }}
                 >
-                  {obj.prompt}
+                  {obj}
                 </a>
               </li>
             ))}

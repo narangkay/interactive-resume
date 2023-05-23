@@ -48,9 +48,10 @@ Agility & Versatility: Tackling problems holistically through expertise in multi
 Novel Solutions: Applying concepts across disciplines in unique ways, using model distillation  to measure reliability of distributed systems
 Collaboration: Leading and growing teams with a focus on sustainable culture and transparency`
 
-const PROMPT_INSTRUCTIONS = `You are Krish, a Senior Software Engineer at Google. You have studied engineering at the Indian Institute of Bombay. You are looking for a new job and have been contacted by a recruiter with questions about your resume. Do your best to answer the questions and get the job. Your resume is provided below. Do not make up any information that is not in the resume.
+const PREFIX = "You are Krish, a Senior Software Engineer at Google. You have studied engineering at the Indian Institute of Bombay. You are looking for a new job and have been contacted by a recruiter with questions about your resume. Your resume is provided below. Do not make up any information that is not in the resume."
 
-For example:
+const PROMPT_INSTRUCTIONS = `${PREFIX}
+Do your best to answer the questions and get the job. For example:
 What is your current role?
 I am a Senior Software Engineer at Google, leading a team of 14 engineers responsible for Google's subscriber acquisition and management platform.
 
@@ -62,6 +63,15 @@ A: I have worked on all aspects of distributed systems at Google, including micr
 
 Your resume for reference:
 ${RESUME}
+`
+
+const FOLLOWUP_QUESTIONS_PROMPT = `${PREFIX}
+Suggest at least 2 followup questions that you think the recruiter might ask, that are relevant to the most recent question, and 1 or 2 questions from a different area. Respond with only the questions, separated by commas. Limit your questions to things you know the answer to. Keep the questions relevant for someone who does not have access to the resume. For example:
+What areas of distributed systems have you worked on?, What is your favorite part of working at Google?, What are areas where you can improve?
+
+Your resume for reference:
+${RESUME}
+
 `
 
 export const openaiRouter = createTRPCRouter({
@@ -119,5 +129,49 @@ export const openaiRouter = createTRPCRouter({
       return {
         response: answer
       };
+    }),
+  suggestFollowupQuestions: publicProcedure
+    .input(z.object({ lastQuestion: z.string(), }))
+    .output(z.object({ followupQuestions: z.array(z.string()) }))
+    .mutation(async ({ input: { lastQuestion } }) => {
+      const prompt = `${FOLLOWUP_QUESTIONS_PROMPT}The recruiter has asked the following question: ${lastQuestion}`
+      const fetchResponse = await fetch("https://api.openai.com/v1/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "text-davinci-003",
+          temperature: 0,
+          prompt: prompt,
+          max_tokens: 200,
+        }),
+      })
+      console.log(fetchResponse.status)
+      console.log(fetchResponse.statusText)
+      if (fetchResponse.status !== 200) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `OpenAI returned error ${fetchResponse.status}: ${fetchResponse.statusText}`,
+        });
+      }
+      type JSONResponse = {
+        id: string,
+        choices: Array<{ text: string }>,
+      }
+      const data = await fetchResponse.json() as JSONResponse
+      console.log(data)
+      console.log(data?.id)
+      console.log(data?.choices[0])
+      const answer = data?.choices[0]?.text;
+      if (!answer) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'OpenAI returned no response',
+        });
+      }
+      const followupQuestions = answer.split(',').map((q) => q.trim())
+      return { followupQuestions }
     }),
 });
