@@ -1,6 +1,7 @@
 import { env } from "~/env.mjs";
 import { TRPCError } from '@trpc/server';
 import { askAboutResumePrompt, followupQuestionsPrompt } from "./prompts";
+import { type askAboutResumeInputType, type suggestFollowupQuestionsInputType } from "~/utils/types";
 
 const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
     console.log(params)
@@ -38,7 +39,7 @@ const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
     return response
 }
 
-export const askAboutResumeFetch = async (input: { messages: { role: "user" | "assistant"; content: string }[] }) => {
+export const askAboutResumeFetch = async (input: askAboutResumeInputType) => {
     const messagesWithInstructions = [{ role: "assistant", content: askAboutResumePrompt() }, ...input.messages]
     console.log(messagesWithInstructions[messagesWithInstructions.length - 1])
     return openAiFetch<{ message: { content: string } }>("https://api.openai.com/v1/chat/completions", {
@@ -48,7 +49,7 @@ export const askAboutResumeFetch = async (input: { messages: { role: "user" | "a
     })
 }
 
-export const suggestFollowupQuestionsFetch = async (input: { lastQuestion: string }) => {
+export const suggestFollowupQuestionsFetch = async (input: suggestFollowupQuestionsInputType) => {
     const prompt = followupQuestionsPrompt(input.lastQuestion)
     return openAiFetch<{ text: string }>("https://api.openai.com/v1/completions", {
         model: "text-curie-001",
