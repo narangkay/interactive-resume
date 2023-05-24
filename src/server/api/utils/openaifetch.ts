@@ -1,9 +1,9 @@
 import { env } from "~/env.mjs";
 import { TRPCError } from '@trpc/server';
+import { askAboutResumePrompt, followupQuestionsPrompt } from "./prompts";
 
-export const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
+const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
     console.log(params)
-    console.log(`env.OPENAI_API_KEY: ${env.OPENAI_API_KEY}`)
     const fetchResponse = await fetch(url, {
         method: "POST",
         headers: {
@@ -36,4 +36,24 @@ export const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
         });
     }
     return response
+}
+
+export const askAboutResumeFetch = async (input: { messages: { role: "user" | "assistant"; content: string }[] }) => {
+    const messagesWithInstructions = [{ role: "assistant", content: askAboutResumePrompt() }, ...input.messages]
+    console.log(messagesWithInstructions[messagesWithInstructions.length - 1])
+    return openAiFetch<{ message: { content: string } }>("https://api.openai.com/v1/chat/completions", {
+        model: "gpt-3.5-turbo",
+        temperature: 0,
+        messages: messagesWithInstructions,
+    })
+}
+
+export const suggestFollowupQuestionsFetch = async (input: { lastQuestion: string }) => {
+    const prompt = followupQuestionsPrompt(input.lastQuestion)
+    return openAiFetch<{ text: string }>("https://api.openai.com/v1/completions", {
+        model: "text-curie-001",
+        temperature: 0,
+        prompt: prompt,
+        max_tokens: 200,
+    })
 }
