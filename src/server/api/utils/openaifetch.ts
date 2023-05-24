@@ -47,10 +47,13 @@ const parseResponse = <T>(json: any): T | undefined => {
     return response
 }
 
-export const parseAskAboutResumeResponse = (json: any): string => {
+export const parseAskAboutResumeResponse = (json: any, stream = false): string => {
+    if (stream) {
+        return parseResponse<{ delta: { content: string } }>(json)?.delta?.content ?? ""
+    }
     return parseResponse<{ message: { content: string } }>(json)?.message?.content ?? ""
 }
 
-export const parseSuggestFollowupQuestionsResponse = (json: any): string => {
+export const parseSuggestFollowupQuestionsResponse = (json: any, _stream = false): string => {
     return parseResponse<{ text: string }>(json)?.text ?? ""
 }

@@ -1,10 +1,12 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 
-import { api } from "~/utils/api";
 import React, { useState } from "react";
-
-type messageType = { role: "user" | "assistant"; content: string };
+import { type messageType } from "~/utils/types";
+import {
+  useAskAboutResume,
+  useSuggestFollowupQuestions,
+} from "~/utils/streamingapi";
 
 const Home: NextPage = () => {
   const [messages, setMessages] = useState<messageType[]>([]);
@@ -15,9 +17,8 @@ const Home: NextPage = () => {
     "What is a key skill you have developed through your work experience?",
   ]);
 
-  const askAboutResume = api.openai.askAboutResume.useMutation();
-  const suggestFollowupQuestions =
-    api.openai.suggestFollowupQuestions.useMutation();
+  const askAboutResume = useAskAboutResume();
+  const suggestFollowupQuestions = useSuggestFollowupQuestions();
 
   return (
     <>
