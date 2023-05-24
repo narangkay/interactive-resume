@@ -17,7 +17,7 @@ const openAiFetch = async (url: string, params: any): Promise<Response> => {
     return fetchResponse
 }
 
-export const askAboutResumeFetch = async (input: askAboutResumeInputType, stream: boolean = false) => {
+export const askAboutResumeFetch = async (input: askAboutResumeInputType, stream = false) => {
     const messagesWithInstructions = [{ role: "assistant", content: askAboutResumePrompt() }, ...input.messages]
     console.log(messagesWithInstructions[messagesWithInstructions.length - 1])
     return openAiFetch("https://api.openai.com/v1/chat/completions", {
@@ -28,7 +28,7 @@ export const askAboutResumeFetch = async (input: askAboutResumeInputType, stream
     })
 }
 
-export const suggestFollowupQuestionsFetch = async (input: suggestFollowupQuestionsInputType, stream: boolean = false) => {
+export const suggestFollowupQuestionsFetch = async (input: suggestFollowupQuestionsInputType, stream = false) => {
     const prompt = followupQuestionsPrompt(input.lastQuestion)
     return openAiFetch("https://api.openai.com/v1/completions", {
         model: "text-curie-001",
