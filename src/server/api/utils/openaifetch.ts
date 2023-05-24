@@ -1,9 +1,8 @@
 import { env } from "~/env.mjs";
-import { TRPCError } from '@trpc/server';
 import { askAboutResumePrompt, followupQuestionsPrompt } from "./prompts";
 import { type askAboutResumeInputType, type suggestFollowupQuestionsInputType } from "~/utils/types";
 
-const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
+const openAiFetch = async <T>(url: string, params: any): Promise<{ response: T } | { error: { code: number, text: string } }> => {
     console.log(params)
     const fetchResponse = await fetch(url, {
         method: "POST",
@@ -16,10 +15,7 @@ const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
     console.log(fetchResponse.status)
     console.log(fetchResponse.statusText)
     if (fetchResponse.status !== 200) {
-        throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: `OpenAI returned error ${fetchResponse.status}: ${fetchResponse.statusText}`,
-        });
+        return { error: { code: fetchResponse.status, text: fetchResponse.statusText } }
     }
     type JSONResponse = {
         id: string,
@@ -31,12 +27,9 @@ const openAiFetch = async <T>(url: string, params: any): Promise<T> => {
     const response = data?.choices[0]
     console.log(response)
     if (!response) {
-        throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'OpenAI returned no response',
-        });
+        return { error: { code: 500, text: "OpenAI returned no response" } }
     }
-    return response
+    return { response }
 }
 
 export const askAboutResumeFetch = async (input: askAboutResumeInputType) => {
