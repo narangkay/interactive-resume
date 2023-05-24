@@ -20,6 +20,11 @@ const handler = async (req: Request): Promise<Response> => {
             responseParser = parseSuggestFollowupQuestionsResponse;
             break;
     }
+
+    if (res.status !== 200) {
+        return new Response(undefined, { status: res.status, statusText: res.statusText });
+    }
+
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
 

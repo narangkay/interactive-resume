@@ -20,13 +20,13 @@ function useStreamingOpenAi() {
             })
                 .then(async (response) => {
                     if (!response.ok) {
-                        setState({ isLoading: false, isError: true, error: { message: `OpenAI returned error ${response.status}: ${response.statusText}` } })
+                        setState({ isLoading: false, isError: true, error: { message: `Open AI returned error ${response.status}: ${response.statusText}` } })
                         return
                     }
 
                     const data = response.body;
                     if (!data) {
-                        setState({ isLoading: false, isError: true, error: { message: "OpenAI returned no response" } })
+                        setState({ isLoading: false, isError: true, error: { message: "Open AI returned no response" } })
                         return
                     }
                     const reader = data.getReader();
