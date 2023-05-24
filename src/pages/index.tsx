@@ -94,7 +94,7 @@ const Home: NextPage = () => {
                     </svg>
                     <span>
                       Error! Open AI returned an error:{" "}
-                      {askAboutResume.error.message}
+                      {askAboutResume.error?.message}
                     </span>
                   </div>
                 </div>
