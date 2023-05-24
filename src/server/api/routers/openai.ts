@@ -18,23 +18,33 @@ export const openaiRouter = createTRPCRouter({
         ),
       })
     )
-    .output(z.object({ response: z.string() }))
+    .output(z.object({
+      response: z.array(
+        z.object({
+          role: z.enum(["user", "assistant"]),
+          content: z.string(),
+        })
+      ),
+    }))
     .mutation(async ({ input: { messages } }) => {
-      messages = [{ role: "assistant", content: askAboutResumePrompt() }, ...messages]
+      const messagesWithInstructions = [{ role: "assistant", content: askAboutResumePrompt() }, ...messages]
       console.log(messages[messages.length - 1])
       const response = await openAiFetch<{ message: { content: string } }>("https://api.openai.com/v1/chat/completions", {
         model: "gpt-3.5-turbo",
         temperature: 0,
-        messages: messages,
+        messages: messagesWithInstructions,
       })
       const answer = response.message.content;
       return {
-        response: answer
+        response: [
+          ...messages,
+          { role: "assistant", content: answer },
+        ]
       };
     }),
   suggestFollowupQuestions: publicProcedure
     .input(z.object({ lastQuestion: z.string(), }))
-    .output(z.object({ followupQuestions: z.array(z.string()) }))
+    .output(z.object({ response: z.array(z.string()) }))
     .mutation(async ({ input: { lastQuestion } }) => {
       const prompt = followupQuestionsPrompt(lastQuestion)
       const response = await openAiFetch<{ text: string }>("https://api.openai.com/v1/completions", {
@@ -45,6 +55,6 @@ export const openaiRouter = createTRPCRouter({
       })
       const answer = response.text;
       const followupQuestions = answer.split('\n').map((q) => q.trim()).filter((q) => q.length > 5).filter((q) => q !== 'Followup questions:')
-      return { followupQuestions }
+      return { response: followupQuestions }
     }),
 });

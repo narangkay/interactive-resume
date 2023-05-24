@@ -116,23 +116,17 @@ const Home: NextPage = () => {
                     },
                   ];
                   const lastQuestion = prompt;
+                  setMessages(copyMessages);
+                  setPrompt("");
                   askAboutResume.mutate(
                     {
                       messages: copyMessages,
                     },
                     {
                       onSuccess: (data) => {
-                        setMessages(copyMessages);
                         if (data.response) {
-                          setMessages((prev) => [
-                            ...prev,
-                            {
-                              role: "assistant",
-                              content: data.response,
-                            },
-                          ]);
+                          setMessages(data.response);
                         }
-                        setPrompt("");
                       },
                     }
                   );
@@ -140,8 +134,8 @@ const Home: NextPage = () => {
                     { lastQuestion: lastQuestion },
                     {
                       onSuccess: (data) => {
-                        if (data.followupQuestions) {
-                          setFollowupQuestions(data.followupQuestions);
+                        if (data.response) {
+                          setFollowupQuestions(data.response);
                         }
                       },
                     }
