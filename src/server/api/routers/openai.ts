@@ -9,7 +9,7 @@ const throwErrorOrTransform = async (fetchResponse: Response, parseResponse: (re
   if (fetchResponse.status !== 200) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: `OpenAI returned error ${fetchResponse.status}: ${fetchResponse.statusText}`,
+      message: `Open AI returned error ${fetchResponse.status}: ${fetchResponse.statusText}`,
     });
   }
   return await fetchResponse.json().then(parseResponse)
