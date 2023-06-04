@@ -3,10 +3,7 @@ import Head from "next/head";
 
 import React, { useState } from "react";
 import { type messageType } from "~/utils/types";
-import {
-  useAskAboutResume,
-  useSuggestFollowupQuestions,
-} from "~/utils/streamingapi";
+import { useResumeExpert } from "~/utils/streamingapi";
 
 const Home: NextPage = () => {
   const [messages, setMessages] = useState<messageType[]>([]);
@@ -17,8 +14,7 @@ const Home: NextPage = () => {
     "What is a key skill you have developed through your work experience?",
   ]);
 
-  const askAboutResume = useAskAboutResume();
-  const suggestFollowupQuestions = useSuggestFollowupQuestions();
+  const resumeExpert = useResumeExpert();
 
   return (
     <>
@@ -72,12 +68,12 @@ const Home: NextPage = () => {
                   )}
                 </div>
               ))}
-              {askAboutResume.isLoading && (
+              {resumeExpert.askAboutResumeState.isLoading && (
                 <div className="flex w-full flex-col items-center justify-center bg-transparent pt-5">
                   <progress className="progress progress-info w-[85%]"></progress>
                 </div>
               )}
-              {askAboutResume.isError && (
+              {resumeExpert.askAboutResumeState.isError && (
                 <div className="alert alert-error shadow-lg">
                   <div>
                     <svg
@@ -94,7 +90,7 @@ const Home: NextPage = () => {
                       />
                     </svg>
                     <span>
-                      Error! {askAboutResume.error?.message}
+                      Error! {resumeExpert.askAboutResumeState.error?.message}
                     </span>
                   </div>
                 </div>
@@ -118,22 +114,22 @@ const Home: NextPage = () => {
                   const lastQuestion = prompt;
                   setMessages(copyMessages);
                   setPrompt("");
-                  askAboutResume.mutate(
+                  resumeExpert.mutate(
                     {
-                      messages: copyMessages,
+                      askAboutResumeInput: {
+                        messages: copyMessages,
+                      },
+                      suggestFollowupQuestionsInput: {
+                        lastQuestion: lastQuestion,
+                      },
                     },
                     {
-                      onSuccess: (data) => {
+                      onAskAboutResumeSuccess: (data) => {
                         if (data.response) {
                           setMessages(data.response);
                         }
                       },
-                    }
-                  );
-                  suggestFollowupQuestions.mutate(
-                    { lastQuestion: lastQuestion },
-                    {
-                      onSuccess: (data) => {
+                      onSuggestFollowupQuestionsSuccess: (data) => {
                         if (data.response) {
                           setFollowupQuestions(data.response);
                         }
@@ -151,11 +147,11 @@ const Home: NextPage = () => {
                     setPrompt(e.target.value);
                   }}
                   value={prompt}
-                  disabled={askAboutResume.isLoading}
+                  disabled={resumeExpert.askAboutResumeState.isLoading}
                 />
                 <button
                   className="btn-lg btn bg-amber-400 text-slate-950 hover:bg-gray-300"
-                  disabled={askAboutResume.isLoading}
+                  disabled={resumeExpert.askAboutResumeState.isLoading}
                 >
                   Submit
                 </button>
@@ -165,7 +161,9 @@ const Home: NextPage = () => {
         </div>
         <div
           className={`container flex flex-col items-center justify-center gap-2 px-4 py-16 ${
-            suggestFollowupQuestions.isLoading ? "animate-pulse" : ""
+            resumeExpert.suggestFollowupQuestionsState.isLoading
+              ? "animate-pulse"
+              : ""
           }`}
         >
           <h2 className="text-4xl font-bold text-gray-300">
@@ -174,10 +172,12 @@ const Home: NextPage = () => {
           <ul className="menu w-[60%] bg-transparent p-2">
             {followupQuestions.map((obj, i) => (
               <li
-                className={`pb-2 ${askAboutResume.isLoading ? "disabled" : ""}`}
+                className={`pb-2 ${
+                  resumeExpert.suggestFollowupQuestionsState.isLoading ? "disabled" : ""
+                }`}
                 key={i}
               >
-                {askAboutResume.isLoading ? (
+                {resumeExpert.suggestFollowupQuestionsState.isLoading ? (
                   <div className="border-2 border-gray-600 text-2xl text-gray-300">
                     {obj}
                   </div>

@@ -53,10 +53,10 @@ function useStreamingOpenAi() {
     }
 }
 
-export function useAskAboutResume() {
+function useAskAboutResume() {
     const { state, fetchWrapper } = useStreamingOpenAi()
     return {
-        ...state,
+        state,
         mutate: (input: askAboutResumeInputType, params: { onSuccess: (data: askAboutResumeOutputType) => void }) => {
             fetchWrapper({ endpoint: "askAboutResume", params: input }, (response) => {
                 params.onSuccess({ response: [...input.messages, { role: "assistant", content: response }] })
@@ -65,14 +65,35 @@ export function useAskAboutResume() {
     }
 }
 
-export function useSuggestFollowupQuestions() {
+function useSuggestFollowupQuestions() {
     const { state, fetchWrapper } = useStreamingOpenAi()
     return {
-        ...state,
+        state,
         mutate: (input: suggestFollowupQuestionsInputType, params: { onSuccess: (data: suggestFollowupQuestionsOutputType) => void }) => {
             fetchWrapper({ endpoint: "suggestFollowupQuestions", params: input }, (response) => {
                 params.onSuccess({ response: response.split('\n').map((q) => q.trim()).filter((q) => q.length > 5).filter((q) => q !== 'Followup questions:') })
             })
+        }
+    }
+}
+
+export function useResumeExpert() {
+    const askAboutResume = useAskAboutResume();
+    const suggestFollowupQuestions = useSuggestFollowupQuestions();
+    return {
+        askAboutResumeState: askAboutResume.state,
+        suggestFollowupQuestionsState: suggestFollowupQuestions.state,
+        mutate: (
+            input: {
+                askAboutResumeInput: askAboutResumeInputType,
+                suggestFollowupQuestionsInput: suggestFollowupQuestionsInputType,
+            },
+            params: {
+                onAskAboutResumeSuccess: (data: askAboutResumeOutputType) => void,
+                onSuggestFollowupQuestionsSuccess: (data: suggestFollowupQuestionsOutputType) => void,
+            }) => {
+            askAboutResume.mutate(input.askAboutResumeInput, { onSuccess: params.onAskAboutResumeSuccess })
+            suggestFollowupQuestions.mutate(input.suggestFollowupQuestionsInput, { onSuccess: params.onSuggestFollowupQuestionsSuccess })
         }
     }
 }
