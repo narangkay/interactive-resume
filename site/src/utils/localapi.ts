@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
 import { useLocalModel } from "./localmodel";
-import { set } from "zod";
 
 export function getState(status: statusType, error?: Error, progress?: progressType): stateType {
     return {
@@ -10,7 +9,7 @@ export function getState(status: statusType, error?: Error, progress?: progressT
         isSuccess: status === "success",
         isLoading: status === "loading",
         isError: status === "error",
-        error: status === "error" ? { message: error?.message??"Unknonwn error" } : undefined,
+        error: status === "error" ? { message: error?.message ?? "Unknonwn error" } : undefined,
         progress: status === "loading" ? progress : undefined,
     }
 }
