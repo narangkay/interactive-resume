@@ -71,6 +71,12 @@ Your resume for reference:
 ${RESUME}
 `
 
+const STATIC_QUESTIONS = [
+    "What do you know about distributed systems?",
+    "What was your longest role?",
+    "What is a key skill you have developed through your work experience?",
+]
+
 export const askAboutResumePrompt = () => {
     return ANSWER_RESUME_QUESTIONS_INSTRUCTION_PROMPT;
 }
@@ -78,4 +84,8 @@ export const askAboutResumePrompt = () => {
 export const followupQuestionsPrompt = (lastQuestion: string) => {
     return `${FOLLOWUP_QUESTIONS_PROMPT}The recruiter has asked the following question: ${lastQuestion}
     Followup questions:`;
+};
+
+export const staticQuestions = () => {
+    return STATIC_QUESTIONS;
 };

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
 import { useLocalModel } from "./localmodel";
+import { staticQuestions } from "./prompts";
 
 export function getState(status: statusType, error?: Error, progress?: progressType): stateType {
     return {
@@ -42,8 +43,10 @@ export function useLocalResumeExpert(): resumeExpertType {
                 onAskAboutResumeSuccess: (data: askAboutResumeOutputType) => void,
                 onSuggestFollowupQuestionsSuccess: (data: suggestFollowupQuestionsOutputType) => void,
             }) => {
-            params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: "I am a resume expert. I can help you with your resume." }] });
-            params.onSuggestFollowupQuestionsSuccess({ response: ["What is your name?", "What is your email address?", "What is your phone number?"] })
+            model.data?.generate(input.askAboutResumeInput.lastQuestion).then((response) => {
+                params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: response }] });
+            }).catch((error: errorType) => { console.log(error) })
+            params.onSuggestFollowupQuestionsSuccess({ response: staticQuestions() })
         }
     }
 }

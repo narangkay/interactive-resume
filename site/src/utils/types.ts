@@ -1,6 +1,6 @@
 export type messageType = { role: "user" | "assistant"; content: string }
 
-export type askAboutResumeInputType = { messages: messageType[] }
+export type askAboutResumeInputType = { lastQuestion: string, messages: messageType[] }
 
 export type askAboutResumeOutputType = { response: messageType[] }
 

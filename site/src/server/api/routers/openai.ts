@@ -20,6 +20,7 @@ export const openaiRouter = createTRPCRouter({
   askAboutResume: publicProcedure
     .input(
       z.object({
+        lastQuestion: z.string(),
         messages: z.array(
           z.object({
             role: z.enum(["user", "assistant"]),

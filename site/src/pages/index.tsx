@@ -5,15 +5,14 @@ import React, { useState } from "react";
 import { resumeExpertType, type messageType } from "~/utils/types";
 import { useResumeExpert } from "~/utils/streamingapi";
 import { useLocalResumeExpert } from "~/utils/localapi";
+import { staticQuestions } from "~/utils/prompts";
 
 const Home: NextPage = () => {
   const [messages, setMessages] = useState<messageType[]>([]);
   const [prompt, setPrompt] = useState("");
-  const [followupQuestions, setFollowupQuestions] = useState<string[]>([
-    "What do you know about distributed systems?",
-    "What was your longest role?",
-    "What is a key skill you have developed through your work experience?",
-  ]);
+  const [followupQuestions, setFollowupQuestions] = useState<string[]>(
+    staticQuestions()
+  );
   const [localInference, setLocalInference] = useState(false);
 
   const openAIResumeExpert = useResumeExpert();
@@ -217,6 +216,7 @@ const Home: NextPage = () => {
                   resumeExpert().mutate(
                     {
                       askAboutResumeInput: {
+                        lastQuestion: prompt,
                         messages: copyMessages,
                       },
                       suggestFollowupQuestionsInput: {
