@@ -59,8 +59,10 @@ Your resume for reference:
 ${RESUME}
 `
 
+const ASK_FOR_FOLLOWUP_QUESTIONS = "Suggest at least 3 followup questions that you think the recruiter might ask from a variety of areas. Respond with only the questions, each on a different line. Limit your questions to things covered in the resume."
+
 const FOLLOWUP_QUESTIONS_PROMPT = `${PREFIX}
-Suggest at least 3 followup questions that you think the recruiter might ask from a variety of areas. Respond with only the questions, each on a different line. Limit your questions to things covered in the resume. For example:
+${ASK_FOR_FOLLOWUP_QUESTIONS} For example:
 The recruiter has asked the following question: What do you know about distributed systems?
 Followup questions:
 What areas of distributed systems have you worked on?
@@ -76,6 +78,10 @@ const STATIC_QUESTIONS = [
     "What was your longest role?",
     "What is a key skill you have developed through your work experience?",
 ]
+
+export const askForFollowupQuestions = () => {
+    return ASK_FOR_FOLLOWUP_QUESTIONS;
+}
 
 export const askAboutResumePrompt = () => {
     return ANSWER_RESUME_QUESTIONS_INSTRUCTION_PROMPT;

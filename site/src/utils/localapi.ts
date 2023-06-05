@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
 import { useLocalModel } from "./localmodel";
-import { staticQuestions } from "./prompts";
+import { askForFollowupQuestions, staticQuestions } from "./prompts";
+import { cat } from "@xenova/transformers";
+import { set } from "zod";
 
 export function getState(status: statusType, error?: Error, progress?: progressType): stateType {
     return {
@@ -17,6 +19,7 @@ export function getState(status: statusType, error?: Error, progress?: progressT
 
 export function useLocalResumeExpert(): resumeExpertType {
     const [askAboutResumeStatus, setAskAboutResumeStatus] = useState<statusType>("idle")
+    const [suggestFollowupQuestionsStatus, setSuggestFollowupQuestionsStatus] = useState<statusType>("idle")
     const [enabled, setEnabled] = useState(false)
     const [modelProgress, setModelProgress] = useState<progressType>({ message: "", percentage: 0 })
     const model = useLocalModel(enabled, (status, progress) => {
@@ -26,7 +29,7 @@ export function useLocalResumeExpert(): resumeExpertType {
     return {
         modelState: getState(model.status, model.error as Error | undefined, modelProgress),
         askAboutResumeState: getState(askAboutResumeStatus),
-        suggestFollowupQuestionsState: getState("success"),
+        suggestFollowupQuestionsState: getState(suggestFollowupQuestionsStatus),
         fetchModel: () => setEnabled(true),
         mutate: (
             input: {
@@ -38,13 +41,32 @@ export function useLocalResumeExpert(): resumeExpertType {
                 onSuggestFollowupQuestionsSuccess: (data: suggestFollowupQuestionsOutputType) => void,
             }) => {
             setAskAboutResumeStatus("loading");
+            setSuggestFollowupQuestionsStatus("loading");
             model.data?.generate(input.askAboutResumeInput.lastQuestion, (_step: number, message: string) => {
                 params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: message }] });
             }).then((response) => {
                 params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: response }] });
                 setAskAboutResumeStatus("success");
-            }).catch((error: errorType) => { console.log(error) })
-            params.onSuggestFollowupQuestionsSuccess({ response: staticQuestions() })
+            }).catch((error: errorType) => {
+                console.log(error)
+                setAskAboutResumeStatus("error");
+            }).then(() => {
+                model.data?.generate(askForFollowupQuestions(), (_step: number, message: string) => {
+                    params.onSuggestFollowupQuestionsSuccess({
+                        response:
+                            message.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
+                    });
+                }).then((response) => {
+                    params.onSuggestFollowupQuestionsSuccess({
+                        response:
+                            response.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
+                    });
+                    setSuggestFollowupQuestionsStatus("success");
+                }).catch((error: errorType) => {
+                    console.log(error)
+                    setSuggestFollowupQuestionsStatus("error");
+                })
+            })
         }
     }
 }
