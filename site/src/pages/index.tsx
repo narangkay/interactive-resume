@@ -89,7 +89,13 @@ const Home: NextPage = () => {
               </h2>
               {resumeExpert().modelState.isLoading ? (
                 <label className="label flex cursor-pointer gap-2">
-                  <progress className="progress progress-warning w-56"></progress>
+                  <progress
+                    className="progress progress-warning w-56"
+                    value={`${
+                      resumeExpert().modelState.progress?.percentage ?? 0
+                    }`}
+                    max="100"
+                  ></progress>
                   <span className="text-lg text-gray-300">Loading Model</span>
                 </label>
               ) : (

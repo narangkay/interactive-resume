@@ -26,7 +26,7 @@ export function useLocalResumeExpert(): resumeExpertType {
     const [modelProgress, setModelProgress] = useState<progressType>({ message: "", percentage: 0 })
     const model = useLocalModel(enabled, (status, progress) => {
         console.log(`model status: ${status} progress: ${progress}`)
-        setModelProgress({ message: status, percentage: progress })
+        setModelProgress({ message: status, percentage: (100*progress) })
     })
     return {
         modelState: getState(model.status, model.error as Error | undefined, modelProgress),
