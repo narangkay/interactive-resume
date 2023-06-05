@@ -1,16 +1,19 @@
 import { useState } from "react"
-import { type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType } from "./types";
+import { type resumeExpertType, type stateType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType } from "./types";
 
 
 function useStreamingOpenAi() {
-    const [state, setState] = useState<{ isLoading: boolean, isError: boolean, error?: { message: string } }>({
+    const [state, setState] = useState<stateType>({
+        status: "idle",
+        isIdle: true,
+        isSuccess: false,
         isLoading: false,
         isError: false,
     })
     return {
         state,
         fetchWrapper: (params: streamingAPIInputType, onStream: (response: string) => void) => {
-            setState({ isError: false, isLoading: true })
+            setState({ status: "loading", isIdle: false, isSuccess: false, isError: false, isLoading: true })
             fetch("/api/streamingtrpc", {
                 method: "POST",
                 headers: {
@@ -20,13 +23,13 @@ function useStreamingOpenAi() {
             })
                 .then(async (response) => {
                     if (!response.ok) {
-                        setState({ isLoading: false, isError: true, error: { message: `Open AI returned error ${response.status}: ${response.statusText}` } })
+                        setState({ status: "error", isIdle: false, isSuccess: false, isLoading: false, isError: true, error: { message: `Open AI returned error ${response.status}: ${response.statusText}` } })
                         return
                     }
 
                     const data = response.body;
                     if (!data) {
-                        setState({ isLoading: false, isError: true, error: { message: "Open AI returned no response" } })
+                        setState({ status: "error", isIdle: false, isSuccess: false, isLoading: false, isError: true, error: { message: "Open AI returned no response" } })
                         return
                     }
                     const reader = data.getReader();
@@ -42,12 +45,12 @@ function useStreamingOpenAi() {
                         onStream(allChunks)
                         await new Promise((resolve) => {
                             setTimeout(resolve, 100);
-                          });
+                        });
                     }
-                    setState({ ...state, isLoading: false })
+                    setState({ status: "success", isIdle: false, isSuccess: true, isLoading: false, isError: false })
                 })
                 .catch((_error) => {
-                    setState({ isLoading: false, isError: true, error: { message: "Unknown error" } })
+                    setState({ status: "error", isIdle: false, isSuccess: false, isLoading: false, isError: true, error: { message: "Unknown error" } })
                 });
         }
     }
@@ -77,12 +80,18 @@ function useSuggestFollowupQuestions() {
     }
 }
 
-export function useResumeExpert() {
-    const askAboutResume = useAskAboutResume();
-    const suggestFollowupQuestions = useSuggestFollowupQuestions();
+export function useResumeExpert(): resumeExpertType {
+    const { state: askAboutResumeState, mutate: askAboutResume } = useAskAboutResume();
+    const { state: suggestFollowupQuestionsState, mutate: suggestFollowupQuestions } = useSuggestFollowupQuestions();
     return {
-        askAboutResumeState: askAboutResume.state,
-        suggestFollowupQuestionsState: suggestFollowupQuestions.state,
+        modelState: { status: "success", isIdle: false, isSuccess: true, isLoading: false, isError: false },
+        askAboutResumeState: askAboutResumeState,
+        suggestFollowupQuestionsState: suggestFollowupQuestionsState,
+        fetchModel: (params?: { onSuccess?: () => void }) => {
+            if (params?.onSuccess) {
+                params.onSuccess()
+            }
+        },
         mutate: (
             input: {
                 askAboutResumeInput: askAboutResumeInputType,
@@ -92,8 +101,8 @@ export function useResumeExpert() {
                 onAskAboutResumeSuccess: (data: askAboutResumeOutputType) => void,
                 onSuggestFollowupQuestionsSuccess: (data: suggestFollowupQuestionsOutputType) => void,
             }) => {
-            askAboutResume.mutate(input.askAboutResumeInput, { onSuccess: params.onAskAboutResumeSuccess })
-            suggestFollowupQuestions.mutate(input.suggestFollowupQuestionsInput, { onSuccess: params.onSuggestFollowupQuestionsSuccess })
+            askAboutResume(input.askAboutResumeInput, { onSuccess: params.onAskAboutResumeSuccess })
+            suggestFollowupQuestions(input.suggestFollowupQuestionsInput, { onSuccess: params.onSuggestFollowupQuestionsSuccess })
         }
     }
 }

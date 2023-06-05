@@ -1,9 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 
-import React, { useState } from "react";
-import { type messageType } from "~/utils/types";
+import React, { useEffect, useState } from "react";
+import { resumeExpertType, type messageType } from "~/utils/types";
 import { useResumeExpert } from "~/utils/streamingapi";
+import { useLocalResumeExpert } from "~/utils/localapi";
 
 const Home: NextPage = () => {
   const [messages, setMessages] = useState<messageType[]>([]);
@@ -13,8 +14,21 @@ const Home: NextPage = () => {
     "What was your longest role?",
     "What is a key skill you have developed through your work experience?",
   ]);
+  const [localInference, setLocalInference] = useState(false);
 
-  const resumeExpert = useResumeExpert();
+  const openAIResumeExpert = useResumeExpert();
+  const localResumeExpert = useLocalResumeExpert();
+
+  const [resumeExpert, setResumeExpert] =
+    useState<resumeExpertType>(openAIResumeExpert);
+
+  useEffect(() => {
+    if (localInference) {
+      setResumeExpert(localResumeExpert);
+    } else {
+      setResumeExpert(openAIResumeExpert);
+    }
+  }, [localInference, openAIResumeExpert, localResumeExpert]);
 
   return (
     <>
@@ -36,10 +50,69 @@ const Home: NextPage = () => {
           </h2>
         </div>
         <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
-          <h2 className="w-[85%] text-3xl text-gray-300">
-            Welcome to my <span className="text-amber-400">interactive</span>{" "}
-            resume.
-          </h2>
+          {resumeExpert.modelState.isIdle ? (
+            <div className="alert w-[85%] bg-amber-400">
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 shrink-0 stroke-slate-950"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <span className="text-left text-3xl text-slate-950">
+                  This will download a 1.5GB model to your browser. Continue?
+                </span>
+              </div>
+              <div>
+                <button
+                  className="btn-md btn border-gray-300 bg-gray-300 text-lg text-slate-950 hover:bg-amber-100"
+                  onClick={() => setLocalInference(false)}
+                >
+                  Deny
+                </button>
+                <button
+                  className="btn-md btn bg-slate-950 text-lg text-gray-300 hover:bg-amber-900"
+                  onClick={() => resumeExpert.fetchModel()}
+                >
+                  Accept
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="container flex w-[85%] justify-between">
+              <h2 className="text-3xl text-gray-300">
+                Welcome to my{" "}
+                <span className="text-amber-400">interactive</span> resume.
+              </h2>
+              {resumeExpert.modelState.isLoading ? (
+                <label className="label flex cursor-pointer gap-2">
+                  <progress className="progress progress-warning w-56"></progress>
+                  <span className="text-lg text-gray-300">Loading Model</span>
+                </label>
+              ) : (
+                <div className="form-control">
+                  <label className="label flex cursor-pointer gap-2">
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-lg border-gray-300 bg-gray-300 checked:border-amber-400 checked:bg-amber-400"
+                      checked={localInference}
+                      onChange={(e) => setLocalInference(e.target.checked)}
+                    />
+                    <span className="text-lg text-gray-300">
+                      <span className="text-amber-400">Local</span> Inference
+                    </span>
+                  </label>
+                </div>
+              )}
+            </div>
+          )}
           <div className="relative h-full w-[85%] bg-transparent">
             <div className="w-full">
               {messages.map((obj, i) => (
@@ -147,11 +220,17 @@ const Home: NextPage = () => {
                     setPrompt(e.target.value);
                   }}
                   value={prompt}
-                  disabled={resumeExpert.askAboutResumeState.isLoading}
+                  disabled={
+                    resumeExpert.askAboutResumeState.isLoading ||
+                    !resumeExpert.modelState.isSuccess
+                  }
                 />
                 <button
                   className="btn-lg btn bg-amber-400 text-slate-950 hover:bg-gray-300"
-                  disabled={resumeExpert.askAboutResumeState.isLoading}
+                  disabled={
+                    resumeExpert.askAboutResumeState.isLoading ||
+                    !resumeExpert.modelState.isSuccess
+                  }
                 >
                   Submit
                 </button>
@@ -173,7 +252,10 @@ const Home: NextPage = () => {
             {followupQuestions.map((obj, i) => (
               <li
                 className={`pb-2 ${
-                  resumeExpert.suggestFollowupQuestionsState.isLoading ? "disabled" : ""
+                  resumeExpert.suggestFollowupQuestionsState.isLoading ||
+                  !resumeExpert.modelState.isSuccess
+                    ? "disabled"
+                    : ""
                 }`}
                 key={i}
               >
