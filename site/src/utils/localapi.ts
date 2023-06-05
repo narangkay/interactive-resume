@@ -1,9 +1,7 @@
 import { useState } from "react"
 import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
 import { useLocalModel } from "./localmodel";
-import { askForFollowupQuestions, staticQuestions } from "./prompts";
-import { cat } from "@xenova/transformers";
-import { set } from "zod";
+import { askForFollowupQuestions } from "./prompts";
 
 export function getState(status: statusType, error?: Error, progress?: progressType): stateType {
     return {
