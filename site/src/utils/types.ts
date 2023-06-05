@@ -12,13 +12,18 @@ export type streamingAPIInputType = { endpoint: "askAboutResume", params: askAbo
 
 export type statusType = "loading" | "idle" | "success" | "error"
 
+export type errorType = { message: string }
+
+export type progressType = { message: string, percentage: number }
+
 export type stateType = {
     status: statusType,
     isSuccess: boolean,
     isLoading: boolean,
     isError: boolean,
     isIdle: boolean,
-    error?: { message: string }
+    error?: errorType,
+    progress?: progressType,
 }
 
 export type resumeExpertType = {

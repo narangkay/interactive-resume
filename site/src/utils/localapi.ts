@@ -1,15 +1,17 @@
 import { useState } from "react"
-import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType } from "./types";
+import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
 import { useLocalModel } from "./localmodel";
+import { set } from "zod";
 
-export function getState(status: statusType, error?: { message: string }): stateType {
+export function getState(status: statusType, error?: Error, progress?: progressType): stateType {
     return {
         status,
         isIdle: status === "idle",
         isSuccess: status === "success",
         isLoading: status === "loading",
         isError: status === "error",
-        error: status === "error" ? error : undefined,
+        error: status === "error" ? { message: error?.message??"Unknonwn error" } : undefined,
+        progress: status === "loading" ? progress : undefined,
     }
 }
 
@@ -22,11 +24,12 @@ export function useLocalResumeExpert(): resumeExpertType {
         suggestFollowupQuestionsStatus: "idle",
     })
     const [enabled, setEnabled] = useState(false)
+    const [modelProgress, setModelProgress] = useState<progressType>({ message: "", percentage: 0 })
     const model = useLocalModel(enabled, (status, progress) => {
-        // do nothing
+        setModelProgress({ message: status, percentage: progress })
     })
     return {
-        modelState: getState(model.status),
+        modelState: getState(model.status, model.error as Error | undefined, modelProgress),
         askAboutResumeState: getState(state.askAboutResumeStatus),
         suggestFollowupQuestionsState: getState(state.suggestFollowupQuestionsStatus),
         fetchModel: () => setEnabled(true),

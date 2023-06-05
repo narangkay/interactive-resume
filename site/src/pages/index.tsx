@@ -89,18 +89,32 @@ const Home: NextPage = () => {
               </h2>
               {resumeExpert().modelState.isLoading ? (
                 <label className="label flex cursor-pointer gap-2">
-                  <progress className="progress progress-warning w-56"></progress>
+                  <progress
+                    className="progress progress-warning w-56"
+                    value={`"${
+                      resumeExpert().modelState.progress?.percentage ?? 0
+                    }"`}
+                    max="100"
+                  ></progress>
                   <span className="text-lg text-gray-300">Loading Model</span>
                 </label>
               ) : (
                 <div className="form-control indicator">
                   {resumeExpert().modelState.isError && (
-                    <div className="indicator-item indicator-middle indicator-end">
+                    <div className="indicator-item indicator-end indicator-middle">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-10 w-10 shrink-0 stroke-amber-400"
                         fill="none"
                         viewBox="0 0 24 24"
+                        onClick={() =>
+                          alert(
+                            `Model loading failed: ${
+                              resumeExpert().modelState.error?.message ??
+                              "unknown error occurred"
+                            }`
+                          )
+                        }
                       >
                         <path
                           strokeLinecap="round"
