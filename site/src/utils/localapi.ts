@@ -49,21 +49,21 @@ export function useLocalResumeExpert(): resumeExpertType {
                 console.log(error)
                 setAskAboutResumeStatus("error");
             }).then(() => {
-                model.data?.generate(askForFollowupQuestions(), (_step: number, message: string) => {
+                return model.data?.generate(askForFollowupQuestions(), (_step: number, message: string) => {
                     params.onSuggestFollowupQuestionsSuccess({
                         response:
                             message.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
                     });
-                }).then((response) => {
-                    params.onSuggestFollowupQuestionsSuccess({
-                        response:
-                            response.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
-                    });
-                    setSuggestFollowupQuestionsStatus("success");
-                }).catch((error: errorType) => {
-                    console.log(error)
-                    setSuggestFollowupQuestionsStatus("error");
                 })
+            }).then((response) => {
+                params.onSuggestFollowupQuestionsSuccess({
+                    response:
+                        response.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
+                });
+                setSuggestFollowupQuestionsStatus("success");
+            }).catch((error: errorType) => {
+                console.log(error)
+                setSuggestFollowupQuestionsStatus("error");
             })
         }
     }
