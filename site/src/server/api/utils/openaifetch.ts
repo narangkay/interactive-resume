@@ -1,5 +1,5 @@
 import { env } from "~/env.mjs";
-import { askAboutResumePrompt, followupQuestionsPrompt } from "./prompts";
+import { askAboutResumePrompt, followupQuestionsPrompt } from "~/utils/prompts";
 import { type askAboutResumeInputType, type suggestFollowupQuestionsInputType } from "~/utils/types";
 
 const openAiFetch = async (url: string, params: any): Promise<Response> => {
