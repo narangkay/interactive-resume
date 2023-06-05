@@ -1,7 +1,7 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { resumeExpertType, type messageType } from "~/utils/types";
 import { useResumeExpert } from "~/utils/streamingapi";
 import { useLocalResumeExpert } from "~/utils/localapi";
@@ -19,16 +19,12 @@ const Home: NextPage = () => {
   const openAIResumeExpert = useResumeExpert();
   const localResumeExpert = useLocalResumeExpert();
 
-  const [resumeExpert, setResumeExpert] =
-    useState<resumeExpertType>(openAIResumeExpert);
-
-  useEffect(() => {
+  const resumeExpert = (): resumeExpertType => {
     if (localInference) {
-      setResumeExpert(localResumeExpert);
-    } else {
-      setResumeExpert(openAIResumeExpert);
+      return localResumeExpert;
     }
-  }, [localInference, openAIResumeExpert, localResumeExpert]);
+    return openAIResumeExpert;
+  };
 
   return (
     <>
@@ -50,7 +46,7 @@ const Home: NextPage = () => {
           </h2>
         </div>
         <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
-          {resumeExpert.modelState.isIdle ? (
+          {resumeExpert().modelState.isIdle ? (
             <div className="alert w-[85%] bg-amber-400">
               <div>
                 <svg
@@ -79,7 +75,7 @@ const Home: NextPage = () => {
                 </button>
                 <button
                   className="btn-md btn bg-slate-950 text-lg text-gray-300 hover:bg-amber-900"
-                  onClick={() => resumeExpert.fetchModel()}
+                  onClick={() => resumeExpert().fetchModel()}
                 >
                   Accept
                 </button>
@@ -91,13 +87,30 @@ const Home: NextPage = () => {
                 Welcome to my{" "}
                 <span className="text-amber-400">interactive</span> resume.
               </h2>
-              {resumeExpert.modelState.isLoading ? (
+              {resumeExpert().modelState.isLoading ? (
                 <label className="label flex cursor-pointer gap-2">
                   <progress className="progress progress-warning w-56"></progress>
                   <span className="text-lg text-gray-300">Loading Model</span>
                 </label>
               ) : (
-                <div className="form-control">
+                <div className="form-control indicator">
+                  {resumeExpert().modelState.isError && (
+                    <div className="indicator-item indicator-middle indicator-end">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-10 w-10 shrink-0 stroke-amber-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                    </div>
+                  )}
                   <label className="label flex cursor-pointer gap-2">
                     <input
                       type="checkbox"
@@ -141,12 +154,12 @@ const Home: NextPage = () => {
                   )}
                 </div>
               ))}
-              {resumeExpert.askAboutResumeState.isLoading && (
+              {resumeExpert().askAboutResumeState.isLoading && (
                 <div className="flex w-full flex-col items-center justify-center bg-transparent pt-5">
                   <progress className="progress progress-info w-[85%]"></progress>
                 </div>
               )}
-              {resumeExpert.askAboutResumeState.isError && (
+              {resumeExpert().askAboutResumeState.isError && (
                 <div className="alert alert-error shadow-lg">
                   <div>
                     <svg
@@ -163,7 +176,7 @@ const Home: NextPage = () => {
                       />
                     </svg>
                     <span>
-                      Error! {resumeExpert.askAboutResumeState.error?.message}
+                      Error! {resumeExpert().askAboutResumeState.error?.message}
                     </span>
                   </div>
                 </div>
@@ -187,7 +200,7 @@ const Home: NextPage = () => {
                   const lastQuestion = prompt;
                   setMessages(copyMessages);
                   setPrompt("");
-                  resumeExpert.mutate(
+                  resumeExpert().mutate(
                     {
                       askAboutResumeInput: {
                         messages: copyMessages,
@@ -221,15 +234,15 @@ const Home: NextPage = () => {
                   }}
                   value={prompt}
                   disabled={
-                    resumeExpert.askAboutResumeState.isLoading ||
-                    !resumeExpert.modelState.isSuccess
+                    resumeExpert().askAboutResumeState.isLoading ||
+                    !resumeExpert().modelState.isSuccess
                   }
                 />
                 <button
                   className="btn-lg btn bg-amber-400 text-slate-950 hover:bg-gray-300"
                   disabled={
-                    resumeExpert.askAboutResumeState.isLoading ||
-                    !resumeExpert.modelState.isSuccess
+                    resumeExpert().askAboutResumeState.isLoading ||
+                    !resumeExpert().modelState.isSuccess
                   }
                 >
                   Submit
@@ -240,7 +253,7 @@ const Home: NextPage = () => {
         </div>
         <div
           className={`container flex flex-col items-center justify-center gap-2 px-4 py-16 ${
-            resumeExpert.suggestFollowupQuestionsState.isLoading
+            resumeExpert().suggestFollowupQuestionsState.isLoading
               ? "animate-pulse"
               : ""
           }`}
@@ -252,14 +265,14 @@ const Home: NextPage = () => {
             {followupQuestions.map((obj, i) => (
               <li
                 className={`pb-2 ${
-                  resumeExpert.suggestFollowupQuestionsState.isLoading ||
-                  !resumeExpert.modelState.isSuccess
+                  resumeExpert().suggestFollowupQuestionsState.isLoading ||
+                  !resumeExpert().modelState.isSuccess
                     ? "disabled"
                     : ""
                 }`}
                 key={i}
               >
-                {resumeExpert.suggestFollowupQuestionsState.isLoading ? (
+                {resumeExpert().suggestFollowupQuestionsState.isLoading ? (
                   <div className="border-2 border-gray-600 text-2xl text-gray-300">
                     {obj}
                   </div>

@@ -87,10 +87,8 @@ export function useResumeExpert(): resumeExpertType {
         modelState: { status: "success", isIdle: false, isSuccess: true, isLoading: false, isError: false },
         askAboutResumeState: askAboutResumeState,
         suggestFollowupQuestionsState: suggestFollowupQuestionsState,
-        fetchModel: (params?: { onSuccess?: () => void }) => {
-            if (params?.onSuccess) {
-                params.onSuccess()
-            }
+        fetchModel: () => {
+            // do nothing
         },
         mutate: (
             input: {

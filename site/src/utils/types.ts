@@ -25,7 +25,7 @@ export type resumeExpertType = {
     modelState: stateType,
     askAboutResumeState: stateType,
     suggestFollowupQuestionsState: stateType,
-    fetchModel: (params?: { onSuccess?: () => void }) => void,
+    fetchModel: () => void,
     mutate: (
         input: {
             askAboutResumeInput: askAboutResumeInputType,

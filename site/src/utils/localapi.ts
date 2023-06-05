@@ -1,31 +1,35 @@
 import { useState } from "react"
 import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType } from "./types";
+import { useLocalModel } from "./localmodel";
 
-export function getState(status: statusType): stateType {
-    return { status, isIdle: status === "idle", isSuccess: status === "success", isLoading: status === "loading", isError: status === "error" }
+export function getState(status: statusType, error?: { message: string }): stateType {
+    return {
+        status,
+        isIdle: status === "idle",
+        isSuccess: status === "success",
+        isLoading: status === "loading",
+        isError: status === "error",
+        error: status === "error" ? error : undefined,
+    }
 }
 
 export function useLocalResumeExpert(): resumeExpertType {
     const [state, setState] = useState<{
-        modelStatus: statusType,
         askAboutResumeStatus: statusType,
         suggestFollowupQuestionsStatus: statusType,
     }>({
-        modelStatus: "idle",
         askAboutResumeStatus: "idle",
         suggestFollowupQuestionsStatus: "idle",
     })
+    const [enabled, setEnabled] = useState(false)
+    const model = useLocalModel(enabled, (status, progress) => {
+        // do nothing
+    })
     return {
-        modelState: getState(state.modelStatus),
+        modelState: getState(model.status),
         askAboutResumeState: getState(state.askAboutResumeStatus),
         suggestFollowupQuestionsState: getState(state.suggestFollowupQuestionsStatus),
-        fetchModel: (params?: { onSuccess?: () => void }) => {
-            setState({ ...state, modelStatus: "loading" })
-            setTimeout(() => {
-                setState({ ...state, modelStatus: "success" })
-            }, 10000)
-            if (params?.onSuccess) { params.onSuccess(); }
-        },
+        fetchModel: () => setEnabled(true),
         mutate: (
             input: {
                 askAboutResumeInput: askAboutResumeInputType,

@@ -1,0 +1,6 @@
+[submodule "3rdparty/tvm-unity"]
+	path = 3rdparty/tvm-unity
+	url = https://github.com/narangkay/mlc-ai-relax
+[submodule "web-llm"]
+	path = web-llm
+	url = https://github.com/narangkay/web-llm
