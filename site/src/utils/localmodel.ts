@@ -8,6 +8,8 @@ export function useLocalModel(enabled: boolean, progressCallback: (status: strin
             progressCallback(`loading model - ${report.text}`, report.progress)
         });
         await chat.reload("vicuna-v1-7b-q4f32_0");
+        console.log(`got chat config ${chat.getPipeline().getConfig()}`)
+        console.log(`got conversation ${chat.getPipeline().getConversation().config}`)
         return chat
     }, { enabled })
 }
