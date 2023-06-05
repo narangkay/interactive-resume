@@ -43,7 +43,9 @@ export function useLocalResumeExpert(): resumeExpertType {
                 onAskAboutResumeSuccess: (data: askAboutResumeOutputType) => void,
                 onSuggestFollowupQuestionsSuccess: (data: suggestFollowupQuestionsOutputType) => void,
             }) => {
-            model.data?.generate(input.askAboutResumeInput.lastQuestion).then((response) => {
+            model.data?.generate(input.askAboutResumeInput.lastQuestion, (_step: number, message: string) => {
+                params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: message }] });
+            }).then((response) => {
                 params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: response }] });
             }).catch((error: errorType) => { console.log(error) })
             params.onSuggestFollowupQuestionsSuccess({ response: staticQuestions() })
