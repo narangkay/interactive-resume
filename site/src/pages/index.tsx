@@ -63,7 +63,7 @@ const Home: NextPage = () => {
                   />
                 </svg>
                 <span className="text-left text-3xl text-slate-950">
-                  This will download a 1.5GB model to your browser. Continue?
+                  This will download a 4GB model to your browser. Continue?
                 </span>
               </div>
               <div>
