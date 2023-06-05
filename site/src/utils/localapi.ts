@@ -16,13 +16,7 @@ export function getState(status: statusType, error?: Error, progress?: progressT
 }
 
 export function useLocalResumeExpert(): resumeExpertType {
-    const [state, setState] = useState<{
-        askAboutResumeStatus: statusType,
-        suggestFollowupQuestionsStatus: statusType,
-    }>({
-        askAboutResumeStatus: "idle",
-        suggestFollowupQuestionsStatus: "idle",
-    })
+    const [askAboutResumeStatus, setAskAboutResumeStatus] = useState<statusType>("idle")
     const [enabled, setEnabled] = useState(false)
     const [modelProgress, setModelProgress] = useState<progressType>({ message: "", percentage: 0 })
     const model = useLocalModel(enabled, (status, progress) => {
@@ -31,8 +25,8 @@ export function useLocalResumeExpert(): resumeExpertType {
     })
     return {
         modelState: getState(model.status, model.error as Error | undefined, modelProgress),
-        askAboutResumeState: getState(state.askAboutResumeStatus),
-        suggestFollowupQuestionsState: getState(state.suggestFollowupQuestionsStatus),
+        askAboutResumeState: getState(askAboutResumeStatus),
+        suggestFollowupQuestionsState: getState("success"),
         fetchModel: () => setEnabled(true),
         mutate: (
             input: {
@@ -43,10 +37,12 @@ export function useLocalResumeExpert(): resumeExpertType {
                 onAskAboutResumeSuccess: (data: askAboutResumeOutputType) => void,
                 onSuggestFollowupQuestionsSuccess: (data: suggestFollowupQuestionsOutputType) => void,
             }) => {
+            setAskAboutResumeStatus("loading");
             model.data?.generate(input.askAboutResumeInput.lastQuestion, (_step: number, message: string) => {
                 params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: message }] });
             }).then((response) => {
                 params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: response }] });
+                setAskAboutResumeStatus("success");
             }).catch((error: errorType) => { console.log(error) })
             params.onSuggestFollowupQuestionsSuccess({ response: staticQuestions() })
         }
