@@ -52,13 +52,13 @@ export function useLocalResumeExpert(): resumeExpertType {
                 return model.data?.generate(askForFollowupQuestions(), (_step: number, message: string) => {
                     params.onSuggestFollowupQuestionsSuccess({
                         response:
-                            message.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
+                            message.split('\n').map((q) => q.trim()).map(q => q.replace(/^\d+\.\s*/, "")).filter((q) => q.length > 5)
                     });
                 })
             }).then((response) => {
                 params.onSuggestFollowupQuestionsSuccess({
                     response:
-                        response.split('\n').map((q) => q.trim()).filter((q) => q.length > 5)
+                        response.split('\n').map((q) => q.trim()).map(q => q.replace(/^\d+\.\s*/, "")).filter((q) => q.length > 5)
                 });
                 setSuggestFollowupQuestionsStatus("success");
             }).catch((error: errorType) => {
