@@ -6,6 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
+    "vercel-build": "./vercel_build.sh",
     "start": "next start"
   },
   "dependencies": {
