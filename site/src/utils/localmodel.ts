@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { ChatModule } from "web-llm";
+import { ChatModule } from "web-llm-next";
 import { askAboutResumePrompt } from "~/utils/prompts";
 
 export function useLocalModel(enabled: boolean, progressCallback: (status: string, progress: number) => void) {

@@ -23,7 +23,7 @@
     "react-dom": "18.2.0",
     "react-query": "^3.39.3",
     "superjson": "1.12.2",
-    "web-llm": "../web-llm",
+    "web-llm-next": "../web-llm",
     "zod": "^3.21.4"
   },
   "devDependencies": {
