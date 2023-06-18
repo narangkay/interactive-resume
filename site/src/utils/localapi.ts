@@ -40,6 +40,7 @@ export function useLocalResumeExpert(): resumeExpertType {
             }) => {
             setAskAboutResumeStatus("loading");
             setSuggestFollowupQuestionsStatus("loading");
+            model.data?.resetChat();
             model.data?.generate(input.askAboutResumeInput.lastQuestion, (_step: number, message: string) => {
                 params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: message }] });
             }).then((response) => {
