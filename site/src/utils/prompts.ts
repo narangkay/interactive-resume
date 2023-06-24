@@ -1,42 +1,42 @@
 
 const RESUME = `Google — Senior Software Engineer
-Subscriber Acquisition And Management Platform, Team Lead
+Team Lead - Subscriptions Platform, Google One
 2022-Present
-- Leading a 14 engineer, full-stack team responsible for XXXM$ in new revenue for Google every year (XXM paid subscribers)
-- Doubled our subscriber base over the past year by developing cross-platform, turnkey solutions for subscriber acquisition (embeddable UI components, SDKs, 1P APIs) and integrating with all major Google products (GMail, Photos, Search, Drive etc)
-- Supported a wide range of subscription management capabilities, including cross-platform billing, powerful user targeting and analytics, lifecycle management, and provisioning of benefits.
-Anomaly Detection And Explainability Of Non-Deterministic Systems
-2019-2021
-- Google owns multiple non-deterministic systems like ranking and NLP that fail in unpredictable ways, our team was tasked with solving reliability and quality issues of these systems at scale
-- Used model distillation techniques to capture complex system behavior into simple, explainable student models. These are then run alongside the original system in production to detect drastic changes in behavior, which is often a regression indicator
-- Successfully demonstrated the value of this technique, and subsequently scaled our model serving infra to millions of QPS to deploy models across Google Search, Assistant, and GMail
+- Leading a 14 engineer, full-stack team driving $500M+ in new revenue for Google via paid subscribers
+- We support turnkey subscription management solutions used by GMail, Photos, Search, Drive etc. (cross-platform billing, user targeting and analytics, lifecycle management, feature gating)
+Tech Lead - Reliability and Quality, Google Assistant
+2019-2022
+- Google Assistant consists of multiple non-deterministic systems (ranking, NLP) that fail in unpredictable ways. Our team was tasked with solving reliability and quality issues for these systems
+- Used model distillation techniques to capture complex system behavior into simple, explainable student models (1TB+ neural nets were compressed into ~1GB decision tree)
+- Distilled models are run alongside teacher models in production with a staggered release, in order to detect regressions on fine grained buckets of data (each leaf of the tree represents a bucket)
+- Implemented a custom trie based inference for the decision tree models, allowing us to scale to >1 million QPS at <50 ms latency
+- Demonstrated a 5x reduction in user facing outages, and expanded to  launch models for Google Search and GMail as well
 Moderation Of User Generated Content On Google Maps
 2017-2019
 - Developed and launched human-in-the-loop workflows that use outputs from existing ML models to create targeted tasks for manual review, and feed the task outputs back as training data
 - Delivered 55% reduction in manual review cost due to targeted nature of the tasks, and a 6% increase in published user content
 Research Projects
+- Information retrieval from PDFs  using on-device, local inference. Adapted the popular WebLLM project into a Next.js compatible website with vector database support, Apr 2023 - Current
 - Automated Ranking And Classification Of Musician Skill. Research Thesis with Prof Preeti Rao, Aug 2016 - May 2017
 - Battery Life And Charge Time Optimization For Li-ion Batteries. Samsung R&D, May 2016 - Jul 2016
-- Wearable Devices For Distributed Audio Experiences. SoundRex, Jan 2016 - Apr 2016
 PUBLICATIONS AND AWARDS
-- Patent US11568869 [2023-01-31]. Low latency automated identification of automated assistant function failure.
+- Patent US11568869, 2023-01-31. Low latency automated identification of automated assistant function failure.
 - Thesis Publication, ISMIR 2017. Acoustic features for determining goodness of tabla strokes.
 SKILLS AND TECHNOLOGIES
-Systems and Architecture Design
+- Systems and Architecture Design
 - Microservices (gRPC - Java/ C++/ Go)
 - Event-driven (Pub/Sub, Cron)
-- SaaS (SDKs, Webviews, APIs)
+- SaaS (Android/iOS SDKs, Webviews)
 - Database Management (Spanner)
 - Pipelines (Flume, MapReduce)
 - Optimization (Memcached, Fibers)
 - Monitoring/Alerting (Proprietary)
 Machine Learning and AI
-- Training (Custom Stack, Tensorflow)
+- Model development: (Pytorch) training, fine-tuning, validation
+- On-device (Apache TVM, ggml)
 - Feature Engineering (NumPy, Beam)
-- Deployment (Custom Stack, TFX)
-- On-device (Google ML Kit)
 Frontend Development
-- Web (Closure, React) 
+- Web (React, NextJS) 
 - Mobile (Flutter, Android Native)
 Agility & Versatility: Tackling problems holistically through expertise in multiple domains, for example - Google’s subscription platform
 Novel Solutions: Applying concepts across disciplines in unique ways, using model distillation  to measure reliability of distributed systems
