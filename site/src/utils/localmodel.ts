@@ -10,13 +10,6 @@ export function useLocalModel(enabled: boolean, progressCallback: (status: strin
         });
         await chat.reload("vicuna-v1-7b-q4f32_0", {
             conv_config: { system: askAboutResumePrompt() }
-        }, {
-            model_list: [
-                {
-                    "model_url": "/vicuna/mlc-chat-vicuna-v1-7b-q4f32_0/",
-                    "local_id": "vicuna-v1-7b-q4f32_0"
-                }
-            ]
         });
         console.log(`got chat config ${JSON.stringify(chat.getPipeline().getConfig())}`)
         console.log(`got conversation ${JSON.stringify(chat.getPipeline().getConversation().config)}`)

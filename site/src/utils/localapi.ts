@@ -40,30 +40,34 @@ export function useLocalResumeExpert(): resumeExpertType {
             }) => {
             setAskAboutResumeStatus("loading");
             setSuggestFollowupQuestionsStatus("loading");
-            model.data?.resetChat();
-            model.data?.generate(input.askAboutResumeInput.lastQuestion, (_step: number, message: string) => {
-                params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: message }] });
-            }).then((response) => {
-                params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: response }] });
-                setAskAboutResumeStatus("success");
-            }).catch((error: errorType) => {
-                console.log(error)
-                setAskAboutResumeStatus("error");
-            }).then(() => {
-                return model.data?.generate(askForFollowupQuestions(), (_step: number, message: string) => {
+            model.data?.resetChat().then(_ => {
+                model.data?.generate(input.askAboutResumeInput.lastQuestion, (_step: number, message: string) => {
+                    params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: message }] });
+                }).then((response) => {
+                    params.onAskAboutResumeSuccess({ response: [...input.askAboutResumeInput.messages, { role: "assistant", content: response }] });
+                    setAskAboutResumeStatus("success");
+                }).catch((error: errorType) => {
+                    console.log(error)
+                    setAskAboutResumeStatus("error");
+                }).then(() => {
+                    return model.data?.generate(askForFollowupQuestions(), (_step: number, message: string) => {
+                        params.onSuggestFollowupQuestionsSuccess({
+                            response:
+                                message.split('\n').map((q) => q.trim()).map(q => q.replace(/^\d+\.\s*/, "")).filter((q) => q.length > 5)
+                        });
+                    })
+                }).then((response) => {
                     params.onSuggestFollowupQuestionsSuccess({
                         response:
-                            message.split('\n').map((q) => q.trim()).map(q => q.replace(/^\d+\.\s*/, "")).filter((q) => q.length > 5)
+                            response.split('\n').map((q) => q.trim()).map(q => q.replace(/^\d+\.\s*/, "")).filter((q) => q.length > 5)
                     });
+                    setSuggestFollowupQuestionsStatus("success");
+                }).catch((error: errorType) => {
+                    console.log(error)
+                    setSuggestFollowupQuestionsStatus("error");
                 })
-            }).then((response) => {
-                params.onSuggestFollowupQuestionsSuccess({
-                    response:
-                        response.split('\n').map((q) => q.trim()).map(q => q.replace(/^\d+\.\s*/, "")).filter((q) => q.length > 5)
-                });
-                setSuggestFollowupQuestionsStatus("success");
-            }).catch((error: errorType) => {
-                console.log(error)
+            }, _ => {
+                setAskAboutResumeStatus("error");
                 setSuggestFollowupQuestionsStatus("error");
             })
         }
