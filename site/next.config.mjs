@@ -8,6 +8,22 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
 
+
+  webpack: (config, { isServer }) => {
+    // Fixes npm packages that depend on `fs` module
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback, // if you miss it, all the other options in fallback, specified
+          // by next.js will be dropped. Doesn't make much sense, but how it is
+        fs: false, // the solution
+        module: false,
+        perf_hooks: false,
+      };
+    }
+
+    return config
+  },
+
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
    * out.

@@ -18,13 +18,13 @@
     "@trpc/server": "^10.18.0",
     "daisyui": "^2.51.6",
     "eventsource-parser": "^1.0.0",
-    "next": "^13.4.1",
+    "next": "^13.4.7",
     "openai": "^3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-query": "^3.39.3",
     "superjson": "1.12.2",
-    "web-llm-next": "../web-llm",
+    "@mlc-ai/web-llm": "^0.2.2",
     "zod": "^3.21.4"
   },
   "devDependencies": {
