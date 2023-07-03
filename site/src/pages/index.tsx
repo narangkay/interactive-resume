@@ -2,7 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 
 import React, { useState } from "react";
-import { resumeExpertType, type messageType } from "~/utils/types";
+import { type resumeExpertType, type messageType } from "~/utils/types";
 import { useResumeExpert } from "~/utils/streamingapi";
 import { useLocalResumeExpert } from "~/utils/localapi";
 import { staticQuestions } from "~/utils/prompts";
