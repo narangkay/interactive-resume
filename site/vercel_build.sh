@@ -30,7 +30,7 @@ echo "built emscripten..."
 echo "building tvm..."
 cd ../relax
 git submodule update --init --recursive
-cd web && make && npm install && npm run build && git restore package-lock.json && cd -
+cd web && make && npm install --production=false && npm run build && git restore package-lock.json && cd -
 echo "built tvm..."
 
 # build web llm
