@@ -1,6 +1,12 @@
 #!/bin/bash
 set -euxo pipefail
 
+# ANSI escape code for blue
+BLUE='\033[0;34m'
+# ANSI escape code to reset color
+NC='\033[0m'
+echo -e "${BLUE}"
+
 # Function to determine the Linux distribution
 get_distribution() {
     if [ -f /etc/os-release ]; then
@@ -46,6 +52,9 @@ echo "built web llm..."
 # build project itself
 echo "building site..."
 cd ../site
-npm install
+npm install --production=false
 npm run build
 echo "built site..."
+
+# Reset color
+echo -e "${NC}"
