@@ -18,7 +18,7 @@ echo "Executing on $distribution..."
 # build emscripten
 echo "building emscripten..."
 cd ../emsdk
-if [ "$distribution" = "rhel" ]; then
+if [ "$distribution" = "amzn" ]; then
     yum install -y xz
 fi
 ./emsdk install latest
