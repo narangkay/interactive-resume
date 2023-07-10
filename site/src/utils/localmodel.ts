@@ -4,7 +4,7 @@ import { askAboutResumePrompt } from "~/utils/prompts";
 
 export function useLocalModel(enabled: boolean, progressCallback: (status: string, progress: number) => void) {
     return useQuery("local-model", async () => {
-        const chat = new ChatModule();
+        const chat:ChatModule = new ChatModule();
         chat.setInitProgressCallback((report) => {
             progressCallback(`loading model - ${report.text}`, report.progress)
         });

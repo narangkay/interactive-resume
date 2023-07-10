@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { type statusType, type stateType, type resumeExpertType, type askAboutResumeOutputType, type askAboutResumeInputType, type streamingAPIInputType, type suggestFollowupQuestionsInputType, type suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
+import type { statusType, stateType, resumeExpertType, askAboutResumeOutputType, askAboutResumeInputType, suggestFollowupQuestionsInputType, suggestFollowupQuestionsOutputType, errorType, progressType } from "./types";
 import { useLocalModel } from "./localmodel";
 import { askForFollowupQuestions } from "./prompts";
 

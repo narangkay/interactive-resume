@@ -4,3 +4,9 @@
 [submodule "web-llm"]
 	path = web-llm
 	url = https://github.com/narangkay/web-llm
+[submodule "emsdk"]
+	path = emsdk
+	url = https://github.com/emscripten-core/emsdk
+[submodule "relax"]
+	path = relax
+	url = https://github.com/mlc-ai/relax
