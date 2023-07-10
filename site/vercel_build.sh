@@ -38,7 +38,7 @@ echo "building web llm..."
 cd ../web-llm
 rm -rf tvm_home
 ln -s ../relax tvm_home
-npm install
+npm install --production=false
 npm run build
 git restore package-lock.json
 echo "built web llm..."
