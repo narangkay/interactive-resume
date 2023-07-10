@@ -1,11 +1,21 @@
 #!/bin/bash
-set -euxo pipefail
 
+# ANSI escape code for green
+GREEN='\033[0;32m'
 # ANSI escape code for blue
 BLUE='\033[0;34m'
 # ANSI escape code to reset color
 NC='\033[0m'
-echo -e "${BLUE}"
+
+# Use green color for xtrace output
+export PS4="${GREEN}+ ${NC}"
+
+# Define a function to echo in blue
+blue_echo() {
+    echo -e "${BLUE}$*${NC}"
+}
+
+set -euxo pipefail
 
 # Function to determine the Linux distribution
 get_distribution() {
@@ -19,10 +29,10 @@ get_distribution() {
 
 # Store the result
 distribution=$(get_distribution)
-echo "Executing on $distribution..."
+blue_echo "Executing on $distribution..."
 
 # build emscripten
-echo "building emscripten..."
+blue_echo "building emscripten..."
 cd ../emsdk
 if [ "$distribution" = "amzn" ]; then
     yum install -y xz
@@ -30,31 +40,28 @@ fi
 ./emsdk install latest
 ./emsdk activate latest
 source ./emsdk_env.sh
-echo "built emscripten..."
+blue_echo "built emscripten..."
 
 # build tvm
-echo "building tvm..."
+blue_echo "building tvm..."
 cd ../relax
 git submodule update --init --recursive
 cd web && make && npm install --production=false && npm run build && git restore package-lock.json && cd -
-echo "built tvm..."
+blue_echo "built tvm..."
 
 # build web llm
-echo "building web llm..."
-cd ../web-llm
+blue_echo "building web llm..."
+cd ../web-llm-src
 rm -rf tvm_home
 ln -s ../relax tvm_home
 npm install --production=false
 npm run build
 git restore package-lock.json
-echo "built web llm..."
+blue_echo "built web llm..."
 
 # build project itself
-echo "building site..."
+blue_echo "building site..."
 cd ../site
 npm install --production=false
 npm run build
-echo "built site..."
-
-# Reset color
-echo -e "${NC}"
+blue_echo "built site..."

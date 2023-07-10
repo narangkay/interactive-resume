@@ -10,3 +10,6 @@
 [submodule "relax"]
 	path = relax
 	url = https://github.com/mlc-ai/relax
+[submodule "web-llm-src"]
+	path = web-llm-src
+	url = https://github.com/mlc-ai/web-llm

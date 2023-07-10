@@ -24,7 +24,7 @@
     "react-dom": "18.2.0",
     "react-query": "^3.39.3",
     "superjson": "1.12.2",
-    "@mlc-ai/web-llm": "../web-llm",
+    "@mlc-ai/web-llm": "../web-llm-src",
     "zod": "^3.21.4"
   },
   "devDependencies": {
