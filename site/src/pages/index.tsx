@@ -99,31 +99,6 @@ const Home: NextPage = () => {
                 </label>
               ) : (
                 <div className="form-control indicator">
-                  {resumeExpert().modelState.isError && (
-                    <div className="indicator-item indicator-end indicator-middle">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-10 w-10 shrink-0 stroke-amber-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        onClick={() =>
-                          alert(
-                            `Model loading failed: ${
-                              resumeExpert().modelState.error?.message ??
-                              "unknown error occurred"
-                            }`
-                          )
-                        }
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                    </div>
-                  )}
                   <label className="label flex cursor-pointer gap-2">
                     <input
                       type="checkbox"
@@ -304,6 +279,16 @@ const Home: NextPage = () => {
             ))}
           </ul>
         </div>
+        {resumeExpert().modelState.isError && (
+          <div className="toast">
+            <div className="alert alert-error">
+              <span>{`Model loading failed: ${
+                resumeExpert().modelState.error?.message ??
+                "unknown error occurred"
+              }`}</span>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
