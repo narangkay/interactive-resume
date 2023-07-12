@@ -6,6 +6,7 @@ import { type resumeExpertType, type messageType } from "~/utils/types";
 import { useResumeExpert } from "~/utils/streamingapi";
 import { useLocalResumeExpert } from "~/utils/localapi";
 import { staticQuestions } from "~/utils/prompts";
+import { isModelCached } from "~/utils/localmodel";
 
 const Home: NextPage = () => {
   const [messages, setMessages] = useState<messageType[]>([]);
@@ -24,6 +25,27 @@ const Home: NextPage = () => {
     }
     return openAIResumeExpert;
   };
+
+  const ontoggle = async (isChecked: boolean) => {
+    let isCached = modelCached;
+    if (isCached == undefined) {
+      try {
+        isCached = await isModelCached();
+      } catch (err) {
+        console.log(err);
+        isCached = false;
+      }
+      setModelCached(isCached);
+    }
+    if (isChecked && isCached && localResumeExpert.modelState.isIdle) {
+      localResumeExpert.fetchModel();
+    }
+    setLocalInference(isChecked);
+  };
+
+  const [modelCached, setModelCached] = useState<boolean | undefined>(
+    undefined
+  );
 
   return (
     <>
@@ -45,7 +67,7 @@ const Home: NextPage = () => {
           </h2>
         </div>
         <div className="container flex flex-col items-center justify-center gap-2 px-4 py-16 ">
-          {resumeExpert().modelState.isIdle ? (
+          {resumeExpert().modelState.isIdle && !modelCached ? (
             <div className="alert w-[85%] bg-amber-400">
               <div>
                 <svg
@@ -95,7 +117,9 @@ const Home: NextPage = () => {
                     }`}
                     max="100"
                   ></progress>
-                  <span className="text-lg text-gray-300">Loading Model</span>
+                  <span className="text-lg text-gray-300">
+                    {modelCached ? "Loading Cached Model" : "Downloading Model"}
+                  </span>
                 </label>
               ) : (
                 <div className="form-control indicator">
@@ -104,7 +128,11 @@ const Home: NextPage = () => {
                       type="checkbox"
                       className="toggle toggle-lg border-gray-300 bg-gray-300 checked:border-amber-400 checked:bg-amber-400"
                       checked={localInference}
-                      onChange={(e) => setLocalInference(e.target.checked)}
+                      onChange={(e) => {
+                        ontoggle(e.target.checked).catch((err) =>
+                          console.log(err)
+                        );
+                      }}
                     />
                     <span className="text-lg text-gray-300">
                       <span className="text-amber-400">Local</span> Inference

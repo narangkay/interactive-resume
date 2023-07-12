@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { ChatModule } from "@mlc-ai/web-llm";
+import { ChatModule, hasModelInCache } from "@mlc-ai/web-llm";
 import { askAboutResumePrompt } from "~/utils/prompts";
 
 export function useLocalModel(enabled: boolean, progressCallback: (status: string, progress: number) => void) {
@@ -12,4 +12,8 @@ export function useLocalModel(enabled: boolean, progressCallback: (status: strin
             conv_config: { system: askAboutResumePrompt() }
         }).then(() => chat);
     }, { enabled })
+}
+
+export function isModelCached(): Promise<boolean> {
+    return hasModelInCache("vicuna-v1-7b-q4f32_0");
 }
