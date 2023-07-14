@@ -1,4 +1,5 @@
 import { type AppType } from "next/app";
+import { Analytics } from "@vercel/analytics/react";
 
 import { api } from "~/utils/api";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -11,9 +12,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const AnyComponent = Component as any;
   return (
-    <QueryClientProvider client={queryClient}>
-      <AnyComponent {...pageProps} />
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <AnyComponent {...pageProps} />
+      </QueryClientProvider>
+      <Analytics />
+    </>
   );
 };
 
