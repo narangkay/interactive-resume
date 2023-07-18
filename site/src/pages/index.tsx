@@ -317,6 +317,14 @@ const Home: NextPage = () => {
             </div>
           </div>
         )}
+        <form action="https://doc-chat-theta.vercel.app/" target="_blank">
+            <button
+              className="btn-lg btn bg-gray-300 text-slate-950 hover:bg-amber-400"
+              type="submit"
+            >
+              Try it with your own PDF!
+            </button>
+          </form>
       </main>
     </>
   );
