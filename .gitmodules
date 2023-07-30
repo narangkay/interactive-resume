@@ -3,7 +3,7 @@
 	url = https://github.com/emscripten-core/emsdk
 [submodule "relax"]
 	path = relax
-	url = https://github.com/narangkay/mlc-ai-relax
+	url = https://github.com/mlc-ai/relax
     branch = cacheprogress
 [submodule "web-llm-src"]
 	path = web-llm-src
