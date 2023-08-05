@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import { ChatModule, hasModelInCache } from "@mlc-ai/web-llm";
 import { askAboutResumePrompt } from "~/utils/prompts";
 
-const MODEL_LOCAL_ID = "Llama-2-7b-chat-hf-q4f32_1";
+const MODEL_LOCAL_ID = "vicuna-v1-7b-q4f32_0";
 
 const APP_CONFIG = {
 	"model_list": [
