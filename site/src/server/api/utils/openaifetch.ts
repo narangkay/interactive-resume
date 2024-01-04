@@ -31,7 +31,7 @@ export const askAboutResumeFetch = async (input: askAboutResumeInputType, stream
 export const suggestFollowupQuestionsFetch = async (input: suggestFollowupQuestionsInputType, stream = false) => {
     const prompt = followupQuestionsPrompt(input.lastQuestion)
     return openAiFetch("https://api.openai.com/v1/completions", {
-        model: "text-curie-001",
+        model: "gpt-3.5-turbo",
         temperature: 0,
         prompt: prompt,
         max_tokens: 200,
